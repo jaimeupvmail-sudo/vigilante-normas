@@ -5,6 +5,11 @@ import time
 import re
 from datetime import datetime
 
+# --- CONFIGURACIÓN DE HORA ESPAÑOLA ---
+os.environ['TZ'] = 'Europe/Madrid'
+if hasattr(time, 'tzset'):
+    time.tzset()
+
 def guardar_web(html_content):
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
