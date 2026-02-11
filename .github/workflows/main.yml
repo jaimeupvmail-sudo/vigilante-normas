@@ -1,13 +1,16 @@
-name: Vigilante Diario
+name: Vigilante Web
 
 on:
   schedule:
-    # Esto significa: Ejecutar a las 08:00 UTC todos los días
-    - cron: '0 8 * * *'
-  workflow_dispatch: # Esto permite que le des a un botón para probarlo ya
+    - cron: '0 8 * * *' # Ejecutar a las 8:00 AM
+  workflow_dispatch: # Botón manual
+
+# ESTA PARTE ES LA CLAVE QUE FALTABA
+permissions:
+  contents: write
 
 jobs:
-  vigilancia:
+  construir_web:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar código
@@ -18,8 +21,20 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Instalar librerías necesarias
+      - name: Instalar librerías
         run: pip install requests
 
-      - name: Ejecutar el Robot
+      - name: Ejecutar Robot y Crear Web
+        env:
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          WHATSAPP_API_KEY: ${{ secrets.WHATSAPP_API_KEY }}
         run: python robot.py
+
+      # ESTE PASO ES EL QUE GUARDA EL ARCHIVO EN TU CARPETA
+      - name: Publicar cambios en la web
+        run: |
+          git config --global user.name 'Robot Vigilante'
+          git config --global user.email 'robot@vigilante.com'
+          git add index.html
+          git commit -m "Actualización diaria de la web" || echo "Sin cambios"
+          git push
