@@ -41,13 +41,13 @@
   },
   {
     "nombre": "IFS Food Standard",
-    "url": "https://www.ifs-certification.com/es/ifs-portfolio/standards/food-standard",
-    "texto_a_buscar": "IFS Food"
+    "url": "https://www.ifs-certification.com/en/ifs-portfolio/standards/ifs-food",
+    "texto_a_buscar": "Version 8"
   },
   {
     "nombre": "FSSC 22000",
     "url": "https://www.fssc.com/schemes/fssc-22000/",
-    "texto_a_buscar": "FSSC 22000"
+    "texto_a_buscar": "Version 6"
   },
   {
     "nombre": "SQF Code",
