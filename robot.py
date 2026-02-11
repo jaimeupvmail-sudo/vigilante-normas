@@ -10,7 +10,7 @@ def guardar_web(html_content):
         f.write(html_content)
 
 def revisar_normas():
-    print("--- INICIANDO ROBOT CON RADAR DE NOVEDADES ---")
+    print("--- INICIANDO ROBOT CON SEMÁFORO TRICOLOR ---")
     
     try:
         with open('normas.json', 'r') as f:
@@ -21,6 +21,7 @@ def revisar_normas():
 
     resultados_web = []
     
+    # Cabeceras para simular ser un humano (Crucial para IFS/FSSC)
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -30,9 +31,8 @@ def revisar_normas():
     for norma in lista_normas:
         print(f"Escaneando: {norma['nombre']}...")
         
-        # Tipos de modos especiales
+        # Detectamos si has activado el modo amarillo en el JSON
         es_transicion = norma.get('modo') == 'transicion'
-        es_radar = norma.get('modo') == 'detectar_nueva' # Nuevo modo espía
         
         estado_final = "error" # Por defecto
         
@@ -43,27 +43,22 @@ def revisar_normas():
             if respuesta.status_code == 200:
                 contenido = respuesta.text
                 busqueda = norma['texto_a_buscar']
+                
+                # Buscamos el texto (insensible a mayúsculas)
                 encontrado = bool(re.search(re.escape(busqueda), contenido, re.IGNORECASE))
 
-                if es_radar:
-                    # LÓGICA INVERSA PARA EL RADAR
-                    if encontrado:
-                        # Si lo encuentra, es que ha salido la nueva -> ALERTA
-                        estado_final = "nueva_detectada"
-                        print(f"   [ALERTA] ¡NUEVA VERSIÓN DETECTADA!: {busqueda}")
+                if encontrado:
+                    # SI LO ENCUENTRA, DECIDIMOS SI ES VERDE O AMARILLO
+                    if es_transicion:
+                        estado_final = "warn" # Amarillo
+                        print(f"   [AMARILLO] Encontrado, pero en transición.")
                     else:
-                        # Si NO lo encuentra, todo sigue igual -> OK
-                        estado_final = "ok"
-                        print(f"   [OK] Aún no hay rastro de: {busqueda}")
-                
+                        estado_final = "ok"   # Verde
+                        print(f"   [OK] Vigente y correcto.")
                 else:
-                    # LÓGICA NORMAL (Vigilar vigencia)
-                    if encontrado:
-                        estado_final = "ok"
-                        print(f"   [OK] Detectado: {busqueda}")
-                    else:
-                        estado_final = "error"
-                        print(f"   [ALERTA] No se encuentra: {busqueda}")
+                    # SI NO LO ENCUENTRA -> ROJO
+                    estado_final = "error"
+                    print(f"   [ALERTA] No se encuentra: {busqueda}")
             else:
                 print(f"   [ERROR] HTTP {respuesta.status_code}")
                 estado_final = "error"
@@ -76,13 +71,11 @@ def revisar_normas():
             "nombre": norma['nombre'],
             "url": norma['url'],
             "version": norma['texto_a_buscar'],
-            "estado_final": estado_final,
-            "transicion": es_transicion,
-            "es_radar": es_radar
+            "estado_final": estado_final
         })
         time.sleep(2)
 
-    # --- GENERAR WEB ---
+    # --- DISEÑO DE LA WEB ---
     fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
     html_final = f"""
     <!DOCTYPE html>
@@ -92,29 +85,25 @@ def revisar_normas():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Vigilancia Normativa</title>
         <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; padding: 20px; }}
-            .container {{ max-width: 950px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }}
-            h1 {{ text-align: center; color: #1e293b; padding: 25px; margin: 0; border-bottom: 1px solid #e2e8f0; }}
+            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; padding: 20px; }}
+            .container {{ max-width: 900px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; }}
+            h1 {{ text-align: center; color: #0f172a; padding: 30px; margin: 0; border-bottom: 1px solid #e2e8f0; letter-spacing: -0.5px; }}
             table {{ width: 100%; border-collapse: collapse; }}
-            th {{ background: #f1f5f9; color: #475569; padding: 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }}
-            td {{ padding: 18px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }}
+            th {{ background: #f8fafc; color: #64748b; padding: 20px; text-align: left; font-size: 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }}
+            td {{ padding: 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }}
+            tr:last-child td {{ border-bottom: none; }}
             
-            .badge {{ padding: 6px 12px; border-radius: 99px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }}
-            .ok {{ background: #dcfce7; color: #166534; }}
-            .warn {{ background: #fef9c3; color: #854d0e; }}
-            .error {{ background: #fee2e2; color: #991b1b; }}
-            .radar {{ background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }} /* Azul para el radar */
-            .new-release {{ background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; animation: pulse 2s infinite; }} 
+            .badge {{ padding: 6px 12px; border-radius: 99px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }}
+            
+            /* ESTILOS DEL SEMÁFORO */
+            .ok {{ background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }}    /* Verde */
+            .warn {{ background: #fef9c3; color: #a16207; border: 1px solid #fde047; }}  /* Amarillo */
+            .error {{ background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }} /* Rojo */
 
-            .version-tag {{ font-family: 'SF Mono', Consolas, monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; color: #64748b; font-size: 13px; }}
-            a {{ text-decoration: none; color: #0f172a; font-weight: 600; transition: color 0.2s; }}
-            a:hover {{ color: #2563eb; }}
-            
-            @keyframes pulse {{
-                0% {{ box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4); }}
-                70% {{ box-shadow: 0 0 0 10px rgba(255, 165, 0, 0); }}
-                100% {{ box-shadow: 0 0 0 0 rgba(255, 165, 0, 0); }}
-            }}
+            .version-tag {{ font-family: 'SF Mono', Consolas, monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; color: #475569; font-size: 13px; border: 1px solid #e2e8f0; }}
+            a {{ text-decoration: none; color: #0f172a; font-weight: 600; font-size: 15px; }}
+            a:hover {{ color: #2563eb; text-decoration: underline; }}
+            .footer {{ text-align: center; padding: 30px; color: #94a3b8; font-size: 13px; }}
         </style>
     </head>
     <body>
@@ -122,30 +111,22 @@ def revisar_normas():
             <h1>🛡️ Monitor de Normas Oficiales</h1>
             <table>
                 <thead>
-                    <tr><th>Norma / Radar</th><th>Objetivo</th><th>Estado</th></tr>
+                    <tr><th style="width:45%">Norma / Estándar</th><th style="width:25%">Versión Vigilada</th><th style="width:30%">Estado</th></tr>
                 </thead>
                 <tbody>
     """
     
     for r in resultados_web:
-        # LÓGICA VISUAL
-        if r['es_radar']:
-            # Diseño específico para Radares
-            if r['estado_final'] == "nueva_detectada":
-                clase = "new-release"
-                texto = "🚀 ¡PUBLICADA!" # Se encontró lo que buscábamos (IFS 9)
-            else:
-                clase = "radar"
-                texto = "📡 Escaneando..." # No se encontró nada nuevo
+        # LÓGICA DE ICONOS Y TEXTOS
+        if r['estado_final'] == "ok":
+            clase = "ok"
+            texto = "✅ VIGENTE"
+        elif r['estado_final'] == "warn":
+            clase = "warn"
+            texto = "⚠️ EN TRANSICIÓN"
         else:
-            # Diseño normal
-            if r['estado_final'] == "ok":
-                if r['transicion']:
-                    clase, texto = "warn", "⚠️ TRANSICIÓN"
-                else:
-                    clase, texto = "ok", "✅ VIGENTE"
-            else:
-                clase, texto = "error", "🚨 ALERTA CAMBIO"
+            clase = "error"
+            texto = "🚨 ALERTA / CAMBIO"
         
         html_final += f"""
         <tr>
@@ -158,8 +139,8 @@ def revisar_normas():
     html_final += f"""
                 </tbody>
             </table>
-            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">
-                Última actualización: {fecha}
+            <div class="footer">
+                Última verificación: <strong>{fecha}</strong>
             </div>
         </div>
     </body>
