@@ -12,23 +12,20 @@ def guardar_web(html_content):
 def revisar_normas():
     print("--- INICIANDO ROBOT ---")
     
-    # 1. CREAMOS UNA WEB PROVISIONAL (Salvavidas)
-    # Si el robot falla después, al menos veremos esto en la web.
+    # 1. CREAMOS WEB PROVISIONAL
     fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
     html_provisional = f"""
-    <h1>📊 El Robot está trabajando...</h1>
-    <p>Iniciado a las: {fecha}</p>
-    <p>Si ves esto, es que el archivo se ha creado correctamente.</p>
+    <h1>📊 Actualizando datos...</h1>
+    <p>El robot está trabajando. Hora inicio: {fecha}</p>
     """
     guardar_web(html_provisional)
-    print("--- Web provisional creada (index.html) ---")
 
-    # 2. CARGAMOS LAS NORMAS
+    # 2. CARGAMOS NORMAS
     try:
         with open('normas.json', 'r') as f:
             lista_normas = json.load(f)
     except Exception as e:
-        print(f"ERROR FATAL: No encuentro normas.json. {e}")
+        print(f"ERROR: {e}")
         return
 
     resultados_web = []
@@ -43,11 +40,12 @@ def revisar_normas():
             respuesta = requests.get(norma['url'], headers=headers, timeout=15)
             
             if respuesta.status_code == 200:
+                # Buscamos el texto exacto (la versión)
                 if norma['texto_a_buscar'] in respuesta.text:
                     estado_ok = True
-                    print(f"   [OK]")
+                    print(f"   [OK] Encontrado: {norma['texto_a_buscar']}")
                 else:
-                    print(f"   [ALERTA] Texto no encontrado")
+                    print(f"   [ALERTA] No veo la versión: {norma['texto_a_buscar']}")
             else:
                 print(f"   [ERROR] Web caída: {respuesta.status_code}")
 
@@ -57,57 +55,76 @@ def revisar_normas():
         resultados_web.append({
             "nombre": norma['nombre'],
             "url": norma['url'],
-            "texto": norma['texto_a_buscar'],
+            "version": norma['texto_a_buscar'], # AQUÍ GUARDAMOS LA VERSIÓN
             "estado": estado_ok
         })
         time.sleep(1)
 
-    # 4. GENERAMOS LA WEB FINAL BONITA
+    # 4. GENERAMOS LA WEB FINAL (CON 3 COLUMNAS)
     html_final = f"""
     <!DOCTYPE html>
     <html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Estado Normas Alimentarias</title>
+        <title>Monitor de Normas</title>
         <style>
-            body {{ font-family: sans-serif; background: #f4f4f9; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }}
-            h1 {{ text-align: center; color: #2c3e50; }}
-            .card {{ background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
+            body {{ font-family: 'Segoe UI', sans-serif; background: #f4f4f9; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }}
+            h1 {{ text-align: center; color: #2c3e50; margin-bottom: 30px; }}
+            .card {{ background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }}
             table {{ width: 100%; border-collapse: collapse; }}
-            th, td {{ padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }}
-            th {{ background-color: #007bff; color: white; }}
+            th, td {{ padding: 15px; text-align: left; border-bottom: 1px solid #eee; }}
+            th {{ background-color: #007bff; color: white; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }}
+            tr:hover {{ background-color: #f9f9f9; }}
+            .version-tag {{ background: #eef2f7; padding: 4px 8px; border-radius: 4px; font-family: monospace; color: #555; font-size: 0.9em; }}
             .ok {{ color: #28a745; font-weight: bold; }}
             .error {{ color: #dc3545; font-weight: bold; }}
-            a {{ text-decoration: none; color: #007bff; }}
+            a {{ text-decoration: none; color: #2c3e50; font-weight: 600; }}
+            a:hover {{ color: #007bff; }}
+            .footer {{ text-align: center; margin-top: 30px; font-size: 0.8em; color: #888; }}
         </style>
     </head>
     <body>
-        <h1>📊 Monitor de Normas</h1>
+        <h1>📊 Monitor de Normas Oficiales</h1>
         <div class="card">
             <table>
                 <thead>
-                    <tr><th>Norma</th><th>Estado</th></tr>
+                    <tr>
+                        <th style="width: 40%">Norma / Estándar</th>
+                        <th style="width: 30%">Versión Vigente</th>
+                        <th style="width: 30%">Estado</th>
+                    </tr>
                 </thead>
                 <tbody>
     """
     
     for r in resultados_web:
-        icono = "✅ Vigente" if r['estado'] else "🚨 REVISAR"
+        icono = "✅ OK" if r['estado'] else "🚨 ALERTA"
         clase = "ok" if r['estado'] else "error"
-        html_final += f"<tr><td><a href='{r['url']}'>{r['nombre']}</a></td><td class='{clase}'>{icono}</td></tr>"
+        
+        # Aquí pintamos las 3 columnas
+        html_final += f"""
+        <tr>
+            <td><a href='{r['url']}' target='_blank'>{r['nombre']}</a></td>
+            <td><span class="version-tag">{r['version']}</span></td>
+            <td class="{clase}">{icono}</td>
+        </tr>
+        """
 
     html_final += f"""
                 </tbody>
             </table>
         </div>
-        <p style="text-align:center; color:#777; margin-top:20px;">Actualizado: {fecha}</p>
+        <div class="footer">
+            Última verificación: {fecha} <br>
+            Sistema de vigilancia automática.
+        </div>
     </body>
     </html>
     """
     
     guardar_web(html_final)
-    print("--- Web Final Guardada Correctamente ---")
+    print("--- Web Actualizada con Versiones ---")
 
 if __name__ == "__main__":
     revisar_normas()
