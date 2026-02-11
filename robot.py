@@ -10,30 +10,33 @@ def guardar_web(html_content):
         f.write(html_content)
 
 def revisar_normas():
-    print("--- INICIANDO ROBOT ---")
+    print("--- INICIANDO VERIFICACIÓN ---")
     
     try:
         with open('normas.json', 'r') as f:
             lista_normas = json.load(f)
     except Exception as e:
-        print(f"ERROR: {e}")
+        print(f"Error cargando JSON: {e}")
         return
 
-    resultados_web = []
+    resultados = []
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
 
     for norma in lista_normas:
-        print(f"Escaneando: {norma['nombre']}...")
-        
-        # Leemos el modo: si es 'transicion', el estado final será 'warn' (amarillo)
+        nombre = norma.get('nombre')
+        url = norma.get('url')
+        busqueda = norma.get('texto_a_buscar')
+        # Aquí leemos si es transicion o no
         es_transicion = norma.get('modo') == 'transicion'
-        estado_final = "error"
+        
+        print(f"Comprobando {nombre}...")
         
         try:
-            respuesta = requests.get(norma['url'], headers=headers, timeout=20)
-            if respuesta.status_code == 200:
-                encontrado = bool(re.search(re.escape(norma['texto_a_buscar']), respuesta.text, re.IGNORECASE))
-                if encontrado:
+            r = requests.get(url, headers=headers, timeout=20)
+            if r.status_code == 200:
+                # Si encontramos el texto...
+                if re.search(re.escape(busqueda), r.text, re.IGNORECASE):
+                    # Si es modo transicion -> warn, si no -> ok
                     estado_final = "warn" if es_transicion else "ok"
                 else:
                     estado_final = "error"
@@ -42,57 +45,57 @@ def revisar_normas():
         except:
             estado_final = "error"
         
-        resultados_web.append({
-            "nombre": norma['nombre'],
-            "url": norma['url'],
-            "version": norma['texto_a_buscar'],
+        resultados.append({
+            "nombre": nombre,
+            "url": url,
+            "version": busqueda,
             "estado": estado_final
         })
         time.sleep(1)
 
-    # Generación de HTML
+    # Generar HTML con estilos visuales claros
     fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
-    html_final = f"""
+    html = f"""
     <!DOCTYPE html>
-    <html lang="es">
+    <html>
     <head>
         <meta charset="UTF-8">
         <style>
-            body {{ font-family: sans-serif; background: #f0f2f5; padding: 20px; }}
-            .container {{ max-width: 800px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+            body {{ font-family: sans-serif; background: #f4f4f9; padding: 20px; }}
+            .card {{ max-width: 800px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
             table {{ width: 100%; border-collapse: collapse; }}
-            th, td {{ padding: 15px; text-align: left; border-bottom: 1px solid #eee; }}
-            .badge {{ padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 12px; }}
-            .ok {{ background: #dcfce7; color: #166534; }}
-            .warn {{ background: #fef9c3; color: #854d0e; }}
-            .error {{ background: #fee2e2; color: #991b1b; }}
+            th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
+            .badge {{ padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; text-transform: uppercase; }}
+            .ok {{ background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }}
+            .warn {{ background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }}
+            .error {{ background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }}
         </style>
     </head>
     <body>
-        <div class="container">
-            <h1>Monitor de Normas</h1>
+        <div class="card">
+            <h2>Monitor de Normas</h2>
             <table>
                 <tr><th>Norma</th><th>Versión</th><th>Estado</th></tr>
     """
     
-    for r in resultados_web:
-        if r['estado'] == "ok":
+    for res in resultados:
+        if res['estado'] == "ok":
             clase, texto = "ok", "✅ VIGENTE"
-        elif r['estado'] == "warn":
+        elif res['estado'] == "warn":
             clase, texto = "warn", "⚠️ TRANSICIÓN"
         else:
             clase, texto = "error", "🚨 ALERTA"
             
-        html_final += f"""
+        html += f"""
         <tr>
-            <td><a href="{r['url']}">{r['nombre']}</a></td>
-            <td>{r['version']}</td>
+            <td><a href="{res['url']}">{res['nombre']}</a></td>
+            <td>{res['version']}</td>
             <td><span class="badge {clase}">{texto}</span></td>
         </tr>
         """
 
-    html_final += f"</table><p>Última actualización: {fecha}</p></div></body></html>"
-    guardar_web(html_final)
+    html += f"</table><p style='color:gray; font-size:11px;'>Actualizado: {fecha}</p></div></body></html>"
+    guardar_web(html)
 
 if __name__ == "__main__":
     revisar_normas()
