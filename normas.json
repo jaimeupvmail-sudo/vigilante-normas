@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "ISO 9001 - Calidad",
+    "url": "https://www.iso.org/standard/62085.html",
+    "texto_a_buscar": "Edition: 5 (2015-09)"
+  },
+  {
+    "nombre": "ISO 14001 - Medio Ambiente",
+    "url": "https://www.iso.org/standard/60857.html",
+    "texto_a_buscar": "Edition: 3 (2015-09)"
+  },
+  {
+    "nombre": "ISO 45001 - Seguridad Salud",
+    "url": "https://www.iso.org/standard/63787.html",
+    "texto_a_buscar": "Edition: 1 (2018-03)"
+  }
+]
