@@ -55,8 +55,18 @@
     "texto_a_buscar": "Edition 9"
   },
   {
-    "nombre": "GLOBAL G.A.P. (Web General)",
-    "url": "https://www.globalgap.org/standards/",
-    "texto_a_buscar": "IFA"
+    "nombre": "G.G.A.P. Frutas y Hortalizas",
+    "url": "https://www.globalgap.org/what-we-offer/solutions/ifa-fruit-and-vegetables/",
+    "texto_a_buscar": "v6"
+  },
+  {
+    "nombre": "G.G.A.P. Cultivos (Agropecuario)",
+    "url": "https://www.globalgap.org/what-we-offer/solutions/ifa-combinable-crops/",
+    "texto_a_buscar": "v6"
+  },
+  {
+    "nombre": "G.G.A.P. Acuicultura",
+    "url": "https://www.globalgap.org/uk_en/for-producers/globalg.a.p./integrated-farm-assurance-ifa/aquaculture/",
+    "texto_a_buscar": "Aquaculture"
   }
 ]
