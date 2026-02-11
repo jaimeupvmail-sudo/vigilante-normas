@@ -1,0 +1,25 @@
+name: Vigilante Diario
+
+on:
+  schedule:
+    # Esto significa: Ejecutar a las 08:00 UTC todos los días
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Esto permite que le des a un botón para probarlo ya
+
+jobs:
+  vigilancia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar librerías necesarias
+        run: pip install requests
+
+      - name: Ejecutar el Robot
+        run: python robot.py
