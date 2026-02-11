@@ -6,117 +6,135 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Vigilancia Normativa</title>
         <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f9; padding: 20px; }
-            .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; }
-            h1 { text-align: center; color: #1e293b; padding: 20px; margin: 0; background: #fff; border-bottom: 1px solid #e2e8f0; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; padding: 20px; }
+            .container { max-width: 950px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }
+            h1 { text-align: center; color: #1e293b; padding: 25px; margin: 0; border-bottom: 1px solid #e2e8f0; }
             table { width: 100%; border-collapse: collapse; }
-            th { background: #f8fafc; color: #64748b; padding: 15px; text-align: left; font-size: 13px; text-transform: uppercase; }
-            td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; }
-            .badge { padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; display: inline-block; }
+            th { background: #f1f5f9; color: #475569; padding: 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+            td { padding: 18px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+            
+            .badge { padding: 6px 12px; border-radius: 99px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
             .ok { background: #dcfce7; color: #166534; }
             .warn { background: #fef9c3; color: #854d0e; }
             .error { background: #fee2e2; color: #991b1b; }
-            .version { font-family: monospace; background: #f1f5f9; padding: 3px 6px; border-radius: 4px; color: #475569; }
-            a { text-decoration: none; color: #1e293b; font-weight: 600; }
-            .footer { text-align: center; padding: 20px; color: #94a3b8; font-size: 12px; }
+            .radar { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; } /* Azul para el radar */
+            .new-release { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; animation: pulse 2s infinite; } 
+
+            .version-tag { font-family: 'SF Mono', Consolas, monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; color: #64748b; font-size: 13px; }
+            a { text-decoration: none; color: #0f172a; font-weight: 600; transition: color 0.2s; }
+            a:hover { color: #2563eb; }
+            
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4); }
+                70% { box-shadow: 0 0 0 10px rgba(255, 165, 0, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0); }
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>📊 Monitor de Normas Oficiales</h1>
+            <h1>🛡️ Monitor de Normas Oficiales</h1>
             <table>
                 <thead>
-                    <tr><th>Norma / Estándar</th><th>Versión Vigilada</th><th>Estado</th></tr>
+                    <tr><th>Norma / Radar</th><th>Objetivo</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
     
         <tr>
             <td><a href="https://www.iso.org/standard/62085.html" target="_blank">ISO 9001 - Calidad</a></td>
-            <td><span class="version">ISO 9001:2015</span></td>
+            <td><span class="version-tag">ISO 9001:2015</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.iso.org/standard/60857.html" target="_blank">ISO 14001 - Medio Ambiente</a></td>
-            <td><span class="version">ISO 14001:2015</span></td>
+            <td><span class="version-tag">ISO 14001:2015</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.iso.org/standard/63787.html" target="_blank">ISO 45001 - Seguridad Salud</a></td>
-            <td><span class="version">ISO 45001:2018</span></td>
+            <td><span class="version-tag">ISO 45001:2018</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.iso.org/standard/65464.html" target="_blank">ISO 22000 - Inocuidad</a></td>
-            <td><span class="version">ISO 22000:2018</span></td>
+            <td><span class="version-tag">ISO 22000:2018</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.iso.org/standard/69426.html" target="_blank">ISO 50001 - Energía</a></td>
-            <td><span class="version">ISO 50001:2018</span></td>
+            <td><span class="version-tag">ISO 50001:2018</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.iso.org/standard/27001" target="_blank">ISO 27001 - Seguridad Info</a></td>
-            <td><span class="version">ISO/IEC 27001:2022</span></td>
+            <td><span class="version-tag">ISO/IEC 27001:2022</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.iso.org/standard/66912.html" target="_blank">ISO 17025 - Laboratorios</a></td>
-            <td><span class="version">ISO/IEC 17025:2017</span></td>
+            <td><span class="version-tag">ISO/IEC 17025:2017</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.brcgs.com/our-standards/food-safety/" target="_blank">BRCGS Food Safety</a></td>
-            <td><span class="version">Issue 9</span></td>
+            <td><span class="version-tag">Issue 9</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.ifs-certification.com/en/ifs-portfolio/standards/food-standard" target="_blank">IFS Food Standard</a></td>
-            <td><span class="version">Food v8</span></td>
+            <td><span class="version-tag">Food v8</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
+            <td><a href="https://www.ifs-certification.com/en/ifs-portfolio/standards/ifs-food" target="_blank">RADAR: IFS News (Busca v9)</a></td>
+            <td><span class="version-tag">IFS Food 9</span></td>
+            <td><span class="badge radar">📡 Escaneando...</span></td>
+        </tr>
+        
+        <tr>
             <td><a href="https://www.fssc.com/fssc-22000/documents/version-6-documents/" target="_blank">FSSC 22000</a></td>
-            <td><span class="version">V6.0</span></td>
+            <td><span class="version-tag">V6.0</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.sqfi.com/the-sqf-code/choose-your-code/library-of-codes" target="_blank">SQF Code</a></td>
-            <td><span class="version">Edition 9</span></td>
+            <td><span class="version-tag">Edition 9</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.globalgap.org/what-we-offer/solutions/ifa-fruit-and-vegetables/" target="_blank">G.G.A.P. Frutas y Hortalizas</a></td>
-            <td><span class="version">v6</span></td>
+            <td><span class="version-tag">v6</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.globalgap.org/what-we-offer/solutions/ifa-combinable-crops/" target="_blank">G.G.A.P. Cultivos (Agropecuario)</a></td>
-            <td><span class="version">v6</span></td>
+            <td><span class="version-tag">v6</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
         <tr>
             <td><a href="https://www.globalgap.org/uk_en/for-producers/globalg.a.p./integrated-farm-assurance-ifa/aquaculture/" target="_blank">G.G.A.P. Acuicultura</a></td>
-            <td><span class="version">Aquaculture</span></td>
+            <td><span class="version-tag">Aquaculture</span></td>
             <td><span class="badge ok">✅ VIGENTE</span></td>
         </tr>
         
                 </tbody>
             </table>
-            <div class="footer">Última actualización: 11/02/2026 18:31</div>
+            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">
+                Última actualización: 11/02/2026 18:40
+            </div>
         </div>
     </body>
     </html>
