@@ -1,56 +1,50 @@
 import requests
 import json
-import os
+import time
 
-# Colores para que se vea bonito en el log
+# Colores
 VERDE = '\033[92m'
 ROJO = '\033[91m'
+AMARILLO = '\033[93m'
 RESET = '\033[0m'
 
 def revisar_normas():
-    # 1. Leemos la lista de normas
     with open('normas.json', 'r') as f:
         lista_normas = json.load(f)
     
-    hay_cambios = False
-    errores = False
+    print("--- INICIANDO MODO DETECTIVE ---")
 
-    print("--- INICIANDO ESCANEO DE NORMAS ---")
-
-    # 2. Revisamos una a una
     for norma in lista_normas:
-        print(f"Revisando: {norma['nombre']}...")
+        print(f"\nRevisando: {norma['nombre']}...")
         
         try:
-            # El robot visita la web
-            respuesta = requests.get(norma['url'], headers={'User-Agent': 'Mozilla/5.0'})
+            # Usamos un User-Agent más completo para parecer un navegador real de Chrome
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            
+            respuesta = requests.get(norma['url'], headers=headers, timeout=15)
             
             if respuesta.status_code == 200:
                 contenido = respuesta.text
                 
-                # BUSCAMOS EL TEXTO CLAVE
+                # BUSQUEDA
                 if norma['texto_a_buscar'] in contenido:
-                    print(f"{VERDE}[OK]{RESET} Sin cambios. Sigue vigente: {norma['texto_a_buscar']}")
+                    print(f"{VERDE}[OK] ENCONTRADO:{RESET} {norma['texto_a_buscar']}")
                 else:
-                    print(f"{ROJO}[ALERTA]{RESET} ¡CAMBIO DETECTADO! El texto '{norma['texto_a_buscar']}' ha desaparecido.")
-                    print(f"Verificar aquí: {norma['url']}")
-                    hay_cambios = True
+                    print(f"{ROJO}[ALERTA] NO ENCONTRADO:{RESET} {norma['texto_a_buscar']}")
+                    # AQUÍ ESTÁ LA MAGIA: Nos dirá qué está viendo realmente
+                    print(f"{AMARILLO}--- ¿Qué ve el robot? (Primeros 100 caracteres) ---{RESET}")
+                    print(contenido[:100].replace('\n', ' ')) # Muestra un trocito de la web
+                    print(f"{AMARILLO}---------------------------------------------------{RESET}")
             else:
-                print(f"{ROJO}[ERROR]{RESET} No se pudo entrar en la web. Código: {respuesta.status_code}")
-                errores = True
+                print(f"{ROJO}[ERROR]{RESET} Código de error: {respuesta.status_code}")
 
         except Exception as e:
             print(f"{ROJO}[ERROR TÉCNICO]{RESET} {e}")
-            errores = True
             
-    print("--- FIN DEL ESCANEO ---")
-    
-    # Esto sirve para avisar al sistema si hubo problemas
-    if hay_cambios:
-        print("RESULTADO: ¡HAY NOVEDADES!")
-        # Aquí en el futuro pondremos el envío de email
-    else:
-        print("RESULTADO: Todo tranquilo.")
+        # Esperamos 2 segundos entre web y web para no saturar
+        time.sleep(2)
 
 if __name__ == "__main__":
     revisar_normas()
