@@ -45,6 +45,12 @@
     "texto_a_buscar": "Food v8"
   },
   {
+    "nombre": "RADAR: IFS News (Busca v9)",
+    "url": "https://www.ifs-certification.com/en/ifs-portfolio/standards/ifs-food",
+    "texto_a_buscar": "IFS Food 9",
+    "modo": "detectar_nueva"
+  }
+  {
     "nombre": "FSSC 22000",
     "url": "https://www.fssc.com/fssc-22000/documents/version-6-documents/",
     "texto_a_buscar": "V6.0"
