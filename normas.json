@@ -46,7 +46,7 @@
   },
   {
     "nombre": "RADAR: IFS News (Busca v9)",
-    "url": "https://www.ifs-certification.com/en/ifs-portfolio/standards/ifs-food",
+    "url": "https://www.ifs-certification.com/en/ifs-portfolio/standards/food-standard",
     "texto_a_buscar": "IFS Food 9",
     "modo": "detectar_nueva"
   },
