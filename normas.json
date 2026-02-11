@@ -20,8 +20,8 @@
     "texto_a_buscar": "ISO 22000:2018"
   },
   {
-    "nombre": "ISO 50001 - Energía",
-    "url": "https://www.iso.org/standard/69114.html",
+    "nombre": "ISO 50001 - Energía (Tu enlace)",
+    "url": "https://www.iso.org/standard/69426.html",
     "texto_a_buscar": "ISO 50001:2018"
   },
   {
@@ -40,9 +40,9 @@
     "texto_a_buscar": "Issue 9"
   },
   {
-    "nombre": "IFS Food Standard",
-    "url": "https://www.ifs-certification.com/en/standards/ifs-food",
-    "texto_a_buscar": "Standard"
+    "nombre": "IFS Food Standard (Tu enlace)",
+    "url": "https://www.ifs-certification.com/es/ifs-portfolio/standards/food-standard",
+    "texto_a_buscar": "Version 8"
   },
   {
     "nombre": "FSSC 22000",
@@ -50,13 +50,13 @@
     "texto_a_buscar": "FSSC 22000"
   },
   {
-    "nombre": "SQF Code",
-    "url": "https://www.sqfi.com/",
+    "nombre": "SQF Code (Tu enlace)",
+    "url": "https://www.sqfi.com/the-sqf-code/choose-your-code/library-of-codes",
     "texto_a_buscar": "Edition 9"
   },
   {
-    "nombre": "GLOBAL G.A.P.",
-    "url": "https://www.globalgap.org/standards/",
-    "texto_a_buscar": "Integrated Farm Assurance"
+    "nombre": "GLOBAL G.A.P. IFA",
+    "url": "https://www.globalgap.org/standards/ifa-integrated-farm-assurance/",
+    "texto_a_buscar": "v6"
   }
 ]
