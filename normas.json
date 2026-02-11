@@ -10,27 +10,27 @@
     "texto_a_buscar": "ISO 14001:2015"
   },
   {
-    "nombre": "ISO 45001 - Seguridad y Salud",
+    "nombre": "ISO 45001 - Seguridad Salud",
     "url": "https://www.iso.org/standard/63787.html",
     "texto_a_buscar": "ISO 45001:2018"
   },
   {
-    "nombre": "ISO 22000 - Inocuidad Alimentaria",
+    "nombre": "ISO 22000 - Inocuidad",
     "url": "https://www.iso.org/standard/65464.html",
     "texto_a_buscar": "ISO 22000:2018"
   },
   {
-    "nombre": "ISO 50001 - Eficiencia Energética",
+    "nombre": "ISO 50001 - Energía",
     "url": "https://www.iso.org/standard/69114.html",
     "texto_a_buscar": "ISO 50001:2018"
   },
   {
-    "nombre": "ISO/IEC 27001 - Seguridad Información",
+    "nombre": "ISO 27001 - Seguridad Info",
     "url": "https://www.iso.org/standard/27001",
     "texto_a_buscar": "ISO/IEC 27001:2022"
   },
   {
-    "nombre": "ISO/IEC 17025 - Laboratorios",
+    "nombre": "ISO 17025 - Laboratorios",
     "url": "https://www.iso.org/standard/66912.html",
     "texto_a_buscar": "ISO/IEC 17025:2017"
   },
@@ -41,22 +41,22 @@
   },
   {
     "nombre": "IFS Food Standard",
-    "url": "https://www.ifs-certification.com/en/food-standard",
-    "texto_a_buscar": "Version 8"
+    "url": "https://www.ifs-certification.com/en/standards/ifs-food",
+    "texto_a_buscar": "Standard"
   },
   {
     "nombre": "FSSC 22000",
     "url": "https://www.fssc.com/schemes/fssc-22000/",
-    "texto_a_buscar": "Version 6.0"
+    "texto_a_buscar": "FSSC 22000"
   },
   {
-    "nombre": "SQF Code (Sustituye a 1000/2000)",
-    "url": "https://www.sqfi.com/codes/",
+    "nombre": "SQF Code",
+    "url": "https://www.sqfi.com/",
     "texto_a_buscar": "Edition 9"
   },
   {
-    "nombre": "GLOBAL G.A.P. IFA",
-    "url": "https://www.globalgap.org/standards/ifa-integrated-farm-assurance/",
-    "texto_a_buscar": "v6"
+    "nombre": "GLOBAL G.A.P.",
+    "url": "https://www.globalgap.org/standards/",
+    "texto_a_buscar": "Integrated Farm Assurance"
   }
 ]
