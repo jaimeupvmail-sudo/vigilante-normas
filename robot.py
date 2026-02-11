@@ -10,114 +10,105 @@ def guardar_web(html_content):
         f.write(html_content)
 
 def revisar_normas():
-    print("--- EJECUTANDO REVISIÓN CRÍTICA ---")
+    print("--- INICIANDO ROBOT V4.0 (FIX AMARILLO) ---")
     
     try:
         with open('normas.json', 'r', encoding='utf-8') as f:
             lista_normas = json.load(f)
     except Exception as e:
-        print(f"ERROR AL LEER JSON: {e}")
+        print(f"Error cargando JSON: {e}")
         return
 
-    resultados = []
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    resultados_web = []
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
 
     for norma in lista_normas:
-        nombre = norma.get('nombre', 'Sin nombre')
-        url = norma.get('url', '')
-        busqueda = norma.get('texto_a_buscar', '')
-        # FORZAMOS LA LECTURA DEL MODO
-        modo_especial = norma.get('modo', '').strip().lower()
-        
-        print(f"Analizando: {nombre} | Modo configurado: {modo_especial}")
+        nombre = norma.get('nombre')
+        busqueda = norma.get('texto_a_buscar')
+        # Detectamos el modo ANTES de cualquier otra cosa
+        es_transicion = norma.get('modo') == 'transicion'
+        es_radar = norma.get('modo') == 'detectar_nueva'
         
         estado_final = "error"
         
         try:
-            r = requests.get(url, headers=headers, timeout=25)
+            r = requests.get(norma['url'], headers=headers, timeout=20)
             if r.status_code == 200:
                 encontrado = bool(re.search(re.escape(busqueda), r.text, re.IGNORECASE))
                 
-                if encontrado:
-                    # SI EL MODO ES TRANSICION, NO HAY DUDA: VA A AMARILLO
-                    if modo_especial == "transicion":
-                        estado_final = "warn"
-                    else:
-                        estado_final = "ok"
+                if es_radar:
+                    estado_final = "nueva_detectada" if encontrado else "ok"
                 else:
-                    estado_final = "error"
+                    if encontrado:
+                        # AQUÍ ESTÁ EL TRUCO: Si es transición, forzamos 'warn'
+                        estado_final = "warn" if es_transicion else "ok"
+                    else:
+                        estado_final = "error"
             else:
                 estado_final = "error"
-        except Exception as e:
-            print(f"Error de red en {nombre}: {e}")
+        except:
             estado_final = "error"
         
-        resultados.append({
+        resultados_web.append({
             "nombre": nombre,
-            "url": url,
+            "url": norma['url'],
             "version": busqueda,
-            "estado": estado_final
+            "estado": estado_final,
+            "es_radar": es_radar
         })
         time.sleep(1)
 
-    # GENERACIÓN DEL HTML
+    # --- GENERAR HTML CON CSS ACTUALIZADO ---
     fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
-    html = f"""
+    html_final = f"""
     <!DOCTYPE html>
     <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>Monitor de Normas</title>
         <style>
-            body {{ font-family: sans-serif; background: #f4f7f6; padding: 20px; }}
-            .card {{ max-width: 850px; margin: auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }}
-            table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-            th {{ background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; }}
-            td {{ padding: 18px 15px; border-bottom: 1px solid #f1f5f9; }}
-            .badge {{ padding: 6px 14px; border-radius: 50px; font-weight: bold; font-size: 11px; }}
-            .ok {{ background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }}
-            .warn {{ background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }}
-            .error {{ background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }}
-            a {{ color: #1e293b; text-decoration: none; font-weight: 600; }}
+            body {{ font-family: 'Segoe UI', sans-serif; background: #f4f7f9; padding: 20px; }}
+            .container {{ max-width: 900px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }}
+            h1 {{ text-align: center; color: #1e293b; padding: 20px; border-bottom: 1px solid #eee; }}
+            table {{ width: 100%; border-collapse: collapse; }}
+            th, td {{ padding: 15px; text-align: left; border-bottom: 1px solid #f1f1f1; }}
+            th {{ background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; }}
+            .badge {{ padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; }}
+            .ok {{ background: #dcfce7; color: #166534; }}
+            .warn {{ background: #fef9c3 !important; color: #854d0e !important; border: 1px solid #fde047; }} /* Forzado */
+            .error {{ background: #fee2e2; color: #991b1b; }}
+            .radar {{ background: #e0f2fe; color: #075985; }}
+            .new {{ background: #ffedd5; color: #9a3412; animation: pulse 2s infinite; }}
+            @keyframes pulse {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.7; }} 100% {{ opacity: 1; }} }}
+            a {{ text-decoration: none; color: #1e293b; font-weight: 600; }}
         </style>
     </head>
     <body>
-        <div class="card">
+        <div class="container">
             <h1>🛡️ Monitor de Normas Oficiales</h1>
             <table>
-                <thead>
-                    <tr><th>Norma / Estándar</th><th>Versión</th><th>Estado</th></tr>
-                </thead>
-                <tbody>
+                <tr><th>Norma / Radar</th><th>Objetivo</th><th>Estado</th></tr>
     """
     
-    for res in resultados:
-        if res['estado'] == "ok":
-            clase, texto = "ok", "✅ VIGENTE"
-        elif res['estado'] == "warn":
-            clase, texto = "warn", "⚠️ EN TRANSICIÓN"
+    for r in resultados_web:
+        if r['es_radar']:
+            clase, texto = ("new", "🚀 PUBLICADA") if r['estado'] == "nueva_detectada" else ("radar", "📡 ESCANEANDO")
         else:
-            clase, texto = "error", "🚨 ALERTA CAMBIO"
+            if r['estado'] == "ok": clase, texto = "ok", "✅ VIGENTE"
+            elif r['estado'] == "warn": clase, texto = "warn", "⚠️ TRANSICIÓN"
+            else: clase, texto = "error", "🚨 ALERTA"
             
-        html += f"""
+        html_final += f"""
         <tr>
-            <td><a href="{res['url']}" target="_blank">{res['nombre']}</a></td>
-            <td style="font-family:monospace; color:#64748b;">{res['version']}</td>
+            <td><a href="{r['url']}">{r['nombre']}</a></td>
+            <td style="color:gray; font-size:12px;">{r['version']}</td>
             <td><span class="badge {clase}">{texto}</span></td>
         </tr>
         """
 
-    html += f"""
-                </tbody>
-            </table>
-            <p style="text-align:center; color:#94a3b8; font-size:12px; margin-top:30px;">
-                Última sincronización: {fecha}
-            </p>
-        </div>
-    </body>
-    </html>
-    """
-    guardar_web(html)
+    html_final += f"</table><div style='padding:20px; text-align:center; color:gray; font-size:11px;'>Actualizado: {fecha}</div></div></body></html>"
+    guardar_web(html_final)
 
 if __name__ == "__main__":
     revisar_normas()
