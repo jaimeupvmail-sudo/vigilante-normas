@@ -2,25 +2,16 @@ import requests
 import json
 import os
 import time
+import re
 from datetime import datetime
-import urllib.parse
 
 def guardar_web(html_content):
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
 
 def revisar_normas():
-    print("--- INICIANDO ROBOT ---")
+    print("--- INICIANDO ROBOT INTELIGENTE ---")
     
-    # 1. CREAMOS WEB PROVISIONAL
-    fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
-    html_provisional = f"""
-    <h1>📊 Actualizando datos...</h1>
-    <p>El robot está trabajando. Hora inicio: {fecha}</p>
-    """
-    guardar_web(html_provisional)
-
-    # 2. CARGAMOS NORMAS
     try:
         with open('normas.json', 'r') as f:
             lista_normas = json.load(f)
@@ -30,101 +21,106 @@ def revisar_normas():
 
     resultados_web = []
     
-    # 3. ESCANEAMOS
+    # Cabeceras para que las webs no nos bloqueen
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8'
+    }
+
     for norma in lista_normas:
-        print(f"Revisando: {norma['nombre']}...")
+        print(f"Escaneando: {norma['nombre']}...")
         estado_ok = False
+        es_transicion = norma.get('modo') == 'transicion'
         
         try:
-            headers = {'User-Agent': 'Mozilla/5.0'}
-            respuesta = requests.get(norma['url'], headers=headers, timeout=15)
+            # Usamos una sesión para mantener cookies (ayuda con IFS)
+            session = requests.Session()
+            respuesta = session.get(norma['url'], headers=headers, timeout=25)
             
             if respuesta.status_code == 200:
-                # Buscamos el texto exacto (la versión)
-                if norma['texto_a_buscar'] in respuesta.text:
+                contenido = respuesta.text
+                busqueda = norma['texto_a_buscar']
+                
+                # Buscamos de forma insensible a mayúsculas/minúsculas y espacios
+                if re.search(re.escape(busqueda), contenido, re.IGNORECASE):
                     estado_ok = True
-                    print(f"   [OK] Encontrado: {norma['texto_a_buscar']}")
+                    print(f"   [OK] Detectado: {busqueda}")
                 else:
-                    print(f"   [ALERTA] No veo la versión: {norma['texto_a_buscar']}")
+                    print(f"   [ALERTA] No se encuentra: {busqueda}")
             else:
-                print(f"   [ERROR] Web caída: {respuesta.status_code}")
+                print(f"   [ERROR] HTTP {respuesta.status_code}")
 
         except Exception as e:
-            print(f"   [ERROR] Excepción: {e}")
+            print(f"   [ERROR] Error de conexión: {e}")
         
         resultados_web.append({
             "nombre": norma['nombre'],
             "url": norma['url'],
-            "version": norma['texto_a_buscar'], # AQUÍ GUARDAMOS LA VERSIÓN
-            "estado": estado_ok
+            "version": norma['texto_a_buscar'],
+            "estado": estado_ok,
+            "transicion": es_transicion
         })
-        time.sleep(1)
+        time.sleep(2) # Pausa amigable para no ser bloqueados
 
-    # 4. GENERAMOS LA WEB FINAL (CON 3 COLUMNAS)
+    # --- GENERAR WEB CON SEMÁFORO ---
+    fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
     html_final = f"""
     <!DOCTYPE html>
     <html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Monitor de Normas</title>
+        <title>Vigilancia Normativa</title>
         <style>
-            body {{ font-family: 'Segoe UI', sans-serif; background: #f4f4f9; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }}
-            h1 {{ text-align: center; color: #2c3e50; margin-bottom: 30px; }}
-            .card {{ background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }}
+            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f9; padding: 20px; }}
+            .container {{ max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; }}
+            h1 {{ text-align: center; color: #1e293b; padding: 20px; margin: 0; background: #fff; border-bottom: 1px solid #e2e8f0; }}
             table {{ width: 100%; border-collapse: collapse; }}
-            th, td {{ padding: 15px; text-align: left; border-bottom: 1px solid #eee; }}
-            th {{ background-color: #007bff; color: white; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }}
-            tr:hover {{ background-color: #f9f9f9; }}
-            .version-tag {{ background: #eef2f7; padding: 4px 8px; border-radius: 4px; font-family: monospace; color: #555; font-size: 0.9em; }}
-            .ok {{ color: #28a745; font-weight: bold; }}
-            .error {{ color: #dc3545; font-weight: bold; }}
-            a {{ text-decoration: none; color: #2c3e50; font-weight: 600; }}
-            a:hover {{ color: #007bff; }}
-            .footer {{ text-align: center; margin-top: 30px; font-size: 0.8em; color: #888; }}
+            th {{ background: #f8fafc; color: #64748b; padding: 15px; text-align: left; font-size: 13px; text-transform: uppercase; }}
+            td {{ padding: 18px 15px; border-bottom: 1px solid #f1f5f9; }}
+            .badge {{ padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; display: inline-block; }}
+            .ok {{ background: #dcfce7; color: #166534; }}
+            .warn {{ background: #fef9c3; color: #854d0e; }}
+            .error {{ background: #fee2e2; color: #991b1b; }}
+            .version {{ font-family: monospace; background: #f1f5f9; padding: 3px 6px; border-radius: 4px; color: #475569; }}
+            a {{ text-decoration: none; color: #1e293b; font-weight: 600; }}
+            .footer {{ text-align: center; padding: 20px; color: #94a3b8; font-size: 12px; }}
         </style>
     </head>
     <body>
-        <h1>📊 Monitor de Normas Oficiales</h1>
-        <div class="card">
+        <div class="container">
+            <h1>📊 Monitor de Normas Oficiales</h1>
             <table>
                 <thead>
-                    <tr>
-                        <th style="width: 40%">Norma / Estándar</th>
-                        <th style="width: 30%">Versión Vigente</th>
-                        <th style="width: 30%">Estado</th>
-                    </tr>
+                    <tr><th>Norma / Estándar</th><th>Versión Vigilada</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
     """
     
     for r in resultados_web:
-        icono = "✅ OK" if r['estado'] else "🚨 ALERTA"
-        clase = "ok" if r['estado'] else "error"
+        if r['estado']:
+            clase, texto = ("warn", "⚠️ TRANSICIÓN") if r['transicion'] else ("ok", "✅ VIGENTE")
+        else:
+            clase, texto = "error", "🚨 ALERTA CAMBIO"
         
-        # Aquí pintamos las 3 columnas
         html_final += f"""
         <tr>
-            <td><a href='{r['url']}' target='_blank'>{r['nombre']}</a></td>
-            <td><span class="version-tag">{r['version']}</span></td>
-            <td class="{clase}">{icono}</td>
+            <td><a href="{r['url']}" target="_blank">{r['nombre']}</a></td>
+            <td><span class="version">{r['version']}</span></td>
+            <td><span class="badge {clase}">{texto}</span></td>
         </tr>
         """
 
     html_final += f"""
                 </tbody>
             </table>
-        </div>
-        <div class="footer">
-            Última verificación: {fecha} <br>
-            Sistema de vigilancia automática.
+            <div class="footer">Última actualización: {fecha}</div>
         </div>
     </body>
     </html>
     """
-    
     guardar_web(html_final)
-    print("--- Web Actualizada con Versiones ---")
 
 if __name__ == "__main__":
     revisar_normas()
