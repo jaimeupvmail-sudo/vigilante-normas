@@ -4,32 +4,127 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Estado Normas Alimentarias</title>
+        <title>Monitor de Normas</title>
         <style>
-            body { font-family: sans-serif; background: #f4f4f9; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
-            h1 { text-align: center; color: #2c3e50; }
-            .card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+            body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+            h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+            .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
             table { width: 100%; border-collapse: collapse; }
-            th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
-            th { background-color: #007bff; color: white; }
+            th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+            th { background-color: #007bff; color: white; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }
+            tr:hover { background-color: #f9f9f9; }
+            .version-tag { background: #eef2f7; padding: 4px 8px; border-radius: 4px; font-family: monospace; color: #555; font-size: 0.9em; }
             .ok { color: #28a745; font-weight: bold; }
             .error { color: #dc3545; font-weight: bold; }
-            a { text-decoration: none; color: #007bff; }
+            a { text-decoration: none; color: #2c3e50; font-weight: 600; }
+            a:hover { color: #007bff; }
+            .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #888; }
         </style>
     </head>
     <body>
-        <h1>📊 Monitor de Normas</h1>
+        <h1>📊 Monitor de Normas Oficiales</h1>
         <div class="card">
             <table>
                 <thead>
-                    <tr><th>Norma</th><th>Estado</th></tr>
+                    <tr>
+                        <th style="width: 40%">Norma / Estándar</th>
+                        <th style="width: 30%">Versión Vigente</th>
+                        <th style="width: 30%">Estado</th>
+                    </tr>
                 </thead>
                 <tbody>
-    <tr><td><a href='https://www.iso.org/standard/62085.html'>ISO 9001 - Calidad</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.iso.org/standard/60857.html'>ISO 14001 - Medio Ambiente</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.iso.org/standard/63787.html'>ISO 45001 - Seguridad Salud</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.iso.org/standard/65464.html'>ISO 22000 - Inocuidad</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.iso.org/standard/69426.html'>ISO 50001 - Energía</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.iso.org/standard/27001'>ISO 27001 - Seguridad Info</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.iso.org/standard/66912.html'>ISO 17025 - Laboratorios</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.brcgs.com/our-standards/food-safety/'>BRCGS Food Safety</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.ifs-certification.com/es/ifs-portfolio/standards/food-standard'>IFS Food Standard</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.fssc.com/schemes/fssc-22000/'>FSSC 22000</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.sqfi.com/the-sqf-code/choose-your-code/library-of-codes'>SQF Code</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.globalgap.org/what-we-offer/solutions/ifa-fruit-and-vegetables/'>G.G.A.P. Frutas y Hortalizas</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.globalgap.org/what-we-offer/solutions/ifa-combinable-crops/'>G.G.A.P. Cultivos (Agropecuario)</a></td><td class='ok'>✅ Vigente</td></tr><tr><td><a href='https://www.globalgap.org/uk_en/for-producers/globalg.a.p./integrated-farm-assurance-ifa/aquaculture/'>G.G.A.P. Acuicultura</a></td><td class='ok'>✅ Vigente</td></tr>
+    
+        <tr>
+            <td><a href='https://www.iso.org/standard/62085.html' target='_blank'>ISO 9001 - Calidad</a></td>
+            <td><span class="version-tag">ISO 9001:2015</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.iso.org/standard/60857.html' target='_blank'>ISO 14001 - Medio Ambiente</a></td>
+            <td><span class="version-tag">ISO 14001:2015</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.iso.org/standard/63787.html' target='_blank'>ISO 45001 - Seguridad Salud</a></td>
+            <td><span class="version-tag">ISO 45001:2018</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.iso.org/standard/65464.html' target='_blank'>ISO 22000 - Inocuidad</a></td>
+            <td><span class="version-tag">ISO 22000:2018</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.iso.org/standard/69426.html' target='_blank'>ISO 50001 - Energía</a></td>
+            <td><span class="version-tag">ISO 50001:2018</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.iso.org/standard/27001' target='_blank'>ISO 27001 - Seguridad Info</a></td>
+            <td><span class="version-tag">ISO/IEC 27001:2022</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.iso.org/standard/66912.html' target='_blank'>ISO 17025 - Laboratorios</a></td>
+            <td><span class="version-tag">ISO/IEC 17025:2017</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.brcgs.com/our-standards/food-safety/' target='_blank'>BRCGS Food Safety</a></td>
+            <td><span class="version-tag">Issue 9</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.ifs-certification.com/es/ifs-portfolio/standards/food-standard' target='_blank'>IFS Food Standard</a></td>
+            <td><span class="version-tag">IFS Food</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.fssc.com/schemes/fssc-22000/' target='_blank'>FSSC 22000</a></td>
+            <td><span class="version-tag">FSSC 22000</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.sqfi.com/the-sqf-code/choose-your-code/library-of-codes' target='_blank'>SQF Code</a></td>
+            <td><span class="version-tag">Edition 9</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.globalgap.org/what-we-offer/solutions/ifa-fruit-and-vegetables/' target='_blank'>G.G.A.P. Frutas y Hortalizas</a></td>
+            <td><span class="version-tag">v6</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.globalgap.org/what-we-offer/solutions/ifa-combinable-crops/' target='_blank'>G.G.A.P. Cultivos (Agropecuario)</a></td>
+            <td><span class="version-tag">v6</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
+        <tr>
+            <td><a href='https://www.globalgap.org/uk_en/for-producers/globalg.a.p./integrated-farm-assurance-ifa/aquaculture/' target='_blank'>G.G.A.P. Acuicultura</a></td>
+            <td><span class="version-tag">Aquaculture</span></td>
+            <td class="ok">✅ OK</td>
+        </tr>
+        
                 </tbody>
             </table>
         </div>
-        <p style="text-align:center; color:#777; margin-top:20px;">Actualizado: 11/02/2026 17:23</p>
+        <div class="footer">
+            Última verificación: 11/02/2026 17:30 <br>
+            Sistema de vigilancia automática.
+        </div>
     </body>
     </html>
     
